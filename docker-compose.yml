@@ -1,6 +1,6 @@
 version: "3"
 services:
-    mongodb:
+    db:
       environment:
         MONGO_INITDB_DATABASE: iot
       container_name: db
@@ -12,7 +12,7 @@ services:
         - ./Docker/mongo:/docker-entrypoint-initdb.d:ro
         - ./Docker/mongo/databases/db:/dbdata:rw
       networks:
-        - iot_net
+        - default
     app:
       build: ./Docker/app
       environment:
@@ -37,7 +37,7 @@ services:
       depends_on:
         - db
 networks:
-  iot_net:
+  default:
     ipam:
       config:
         -
