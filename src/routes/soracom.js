@@ -1,22 +1,49 @@
 var express = require('express');
 var router = express.Router();
 const app = express();
+const path = require('path');
 const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
-const Soracom = require('../models/soracom');
+require('dotenv').config({ path: path.join(__dirname, "../config/.env")});
+const sym = require('symbol-sdk');
+const node = process.env.NODE_URL;
 
-mongoose.connect('mongodb://db/iot');
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
 
-/* GET users listing. */
-router.get('/v1/soracom', function(req, res, next) {
-  let response = "ok";
-  res.send(response);
+router.get('/v1/soracom',  async function(req, res, next) {
+  const repo = new sym.RepositoryFactoryHttp(node);
+  const networkRepo = repo.createNetworkRepository();
+  const networkType = await networkRepo.getNetworkType().toPromise();
+
+  res.send({node: node, networkType: networkType == sym.MAIN_NET ? "MAIN_NET" : "TEST_NET"});
 });
 
-router.post('/v1/soracom', function(req, res, next) {
-  console.log(req.body);
+router.post('/v1/soracom', async function(req, res, next) {
+  const repo = new sym.RepositoryFactoryHttp(node);
+  const txRepo = repo.createTransactionRepository();
+  const networkRepo = repo.createNetworkRepository();
+  const networkType = await networkRepo.getNetworkType().toPromise();
+  const medianFeeMultiplier = (await networkRepo.getTransactionFees().toPromise()).medianFeeMultiplier;
+  const epochAdjustment = await repo.getEpochAdjustment().toPromise();
+  const networkGenerationHash = await repo.getGenerationHash().toPromise();
+  const signerAddress = sym.Account.createFromPrivateKey(process.env.CERTIFICATE_PRIVATE_KEY, networkType); //送信元アドレス
+
+  const tx = sym.TransferTransaction.create(
+    sym.Deadline.create(epochAdjustment),
+    sym.Address.createFromRawAddress(process.env.RECIPIENT_ADDRESS),
+    [],
+    sym.PlainMessage.create(req.body),
+    networkType,
+  ).setMaxFee(medianFeeMultiplier);
+
+  //署名して送信
+  const signedtxd = signerAddress.sign(tx, networkGenerationHash);
+
+  console.log("hash:"+signedtxd.hash);
+  console.log("payload:"+signedtxd.payload);
+
+  txRepo.announce(signedtxd).subscribe((x)=>log(x),(er)=>log(er));
+  
   res.send("ok");
 });
 
