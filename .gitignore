@@ -1,4 +1,2 @@
-Docker/mongo/databases/db/*
-!Docker/mongo/databases/db/.keep
 src/node_modules
 src/config/.env
