@@ -42,7 +42,7 @@ router.post('/v1/soracom', async function(req, res, next) {
   console.log("hash:"+signedtxd.hash);
   console.log("payload:"+signedtxd.payload);
 
-  txRepo.announce(signedtxd).subscribe((x)=>log(x),(er)=>log(er));
+  txRepo.announce(signedtxd).subscribe((x)=>console.log(x),(er)=>console.log(er));
   
   res.send("ok");
 });
