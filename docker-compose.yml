@@ -12,7 +12,7 @@ services:
         - ./Docker/mongo:/docker-entrypoint-initdb.d:ro
         - ./Docker/mongo/databases/db:/dbdata:rw
       networks:
-        - default
+        - iot_net
     app:
       build: ./Docker/app
       environment:
@@ -37,7 +37,7 @@ services:
       depends_on:
         - db
 networks:
-  default:
+  iot_net:
     ipam:
       config:
         -
