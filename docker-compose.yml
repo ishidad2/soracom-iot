@@ -1,6 +1,7 @@
 version: "3"
 services:
     db:
+      user: '1000:1000'
       environment:
         MONGO_INITDB_DATABASE: iot
       container_name: db
