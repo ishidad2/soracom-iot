@@ -1,6 +1,6 @@
 version: "3"
 services:
-    db:
+    mongodb:
       environment:
         MONGO_INITDB_DATABASE: iot
       container_name: db
