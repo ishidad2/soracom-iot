@@ -27,12 +27,13 @@ router.post('/v1/soracom', async function(req, res, next) {
   const epochAdjustment = await repo.getEpochAdjustment().toPromise();
   const networkGenerationHash = await repo.getGenerationHash().toPromise();
   const signerAddress = sym.Account.createFromPrivateKey(process.env.CERTIFICATE_PRIVATE_KEY, networkType); //送信元アドレス
+  const strMessage = JSON.stringify(req.body);
 
   const tx = sym.TransferTransaction.create(
     sym.Deadline.create(epochAdjustment),
     sym.Address.createFromRawAddress(process.env.RECIPIENT_ADDRESS),
     [],
-    sym.PlainMessage.create(req.body),
+    sym.PlainMessage.create(strMessage),
     networkType,
   ).setMaxFee(medianFeeMultiplier);
 
