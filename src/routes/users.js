@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const User = require('../models/user');
 
-mongoose.connect('mongodb://mongodb/user');
+mongoose.connect('mongodb://db/user');
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
 
