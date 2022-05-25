@@ -1,0 +1,3 @@
+Docker/mongo/databases/*
+!Docker/mongo/databases/.keep
+src/node_modules

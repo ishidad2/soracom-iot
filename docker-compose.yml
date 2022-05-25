@@ -1,0 +1,44 @@
+version: "3"
+services:
+    db:
+      environment:
+        MONGO_INITDB_DATABASE: iot
+      container_name: db
+      image: mongo:4.4.3-bionic
+      command: mongod --dbpath=/dbdata --bind_ip=db --wiredTigerCacheSizeGB 2
+      stop_signal: SIGINT
+      working_dir: /docker-entrypoint-initdb.d
+      volumes:
+        - ./Docker/mongo:/docker-entrypoint-initdb.d:ro
+        - ./Docker/mongo/databases/db:/dbdata:rw
+      networks:
+        - default
+    app:
+      build: ./Docker/app
+      environment:
+        - DEBUG=app:*
+      tty: true
+      ports:
+          - '3002:3000'
+      volumes:
+        - ./src:/app
+      working_dir: /app
+      command: npm run dev
+      depends_on:
+        - db
+
+    mongo_express:
+      image: mongo-express:1.0.0-alpha.4
+      restart: always
+      ports:
+        - "8081:8081"
+      environment:
+          ME_CONFIG_MONGODB_SERVER: db
+      depends_on:
+        - db
+networks:
+  default:
+    ipam:
+      config:
+        -
+          subnet: 172.20.0.0/24
