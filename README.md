@@ -23,6 +23,7 @@ cd config
 ```
 # .env.example を .env にリネーム
 vm .env.example .env
+vi .env
 ```
 
 送信元のプライベートキーを設定
