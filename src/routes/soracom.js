@@ -31,7 +31,7 @@ router.post('/v1/soracom', async function(req, res, next) {
 
   const tx = sym.TransferTransaction.create(
     sym.Deadline.create(epochAdjustment),
-    sym.Address.createFromRawAddress(process.env.RECIPIENT_ADDRESS),
+    signerAddress.address,
     [],
     sym.PlainMessage.create(strMessage),
     networkType,
